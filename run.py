@@ -22,7 +22,7 @@ def main():
         [sys.executable, "-m", "uvicorn", "backend.main:app", "--host", "127.0.0.1", "--port", "8000", "--reload"],
         cwd=os.path.dirname(os.path.abspath(__file__)),
     )
-    print("\n✅ FastAPI backend starting on http://127.0.0.1:8000")
+    print("\n FastAPI backend starting on http://127.0.0.1:8000")
     print("   API Docs → http://127.0.0.1:8000/docs")
     time.sleep(2)
 
