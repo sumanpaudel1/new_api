@@ -1,0 +1,30 @@
+# Render Blueprint — deploys both FastAPI backend + Streamlit frontend
+# Docs: https://render.com/docs/blueprint-spec
+
+services:
+  # ── FastAPI Backend ──
+  - type: web
+    name: sportmonks-api
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: SPORTMONKS_API_TOKEN
+        sync: false  # You'll set this manually in the Render dashboard
+      - key: PYTHON_VERSION
+        value: "3.11.0"
+
+  # ── Streamlit Frontend ──
+  - type: web
+    name: sportmonks-frontend
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: streamlit run frontend/app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true
+    envVars:
+      - key: BACKEND_URL
+        fromService:
+          name: sportmonks-api
+          type: web
+          property: host  # Auto-links to the backend URL
+      - key: PYTHON_VERSION
+        value: "3.11.0"
