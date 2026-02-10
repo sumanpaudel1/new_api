@@ -48,7 +48,7 @@ async def token_status():
 
 @app.get("/api/news/pre-match", tags=["News — Pre-Match"])
 async def get_pre_match_news(
-    include: Optional[str] = Query("fixture;league;lines"),
+    include: Optional[str] = Query("fixture.participants;league;lines"),
     order: Optional[str] = Query("desc"),
     per_page: Optional[int] = Query(50),
     page: Optional[int] = Query(1),
@@ -60,7 +60,7 @@ async def get_pre_match_news(
 @app.get("/api/news/pre-match/seasons/{season_id}", tags=["News — Pre-Match"])
 async def get_pre_match_news_by_season(
     season_id: int,
-    include: Optional[str] = Query("fixture;league;lines"),
+    include: Optional[str] = Query("fixture.participants;league;lines"),
     order: Optional[str] = Query("desc"),
     per_page: Optional[int] = Query(50),
     page: Optional[int] = Query(1),
@@ -71,7 +71,7 @@ async def get_pre_match_news_by_season(
 
 @app.get("/api/news/pre-match/upcoming", tags=["News — Pre-Match"])
 async def get_pre_match_news_upcoming(
-    include: Optional[str] = Query("fixture;league;lines"),
+    include: Optional[str] = Query("fixture.participants;league;lines"),
     order: Optional[str] = Query("desc"),
     per_page: Optional[int] = Query(50),
     page: Optional[int] = Query(1),
@@ -86,7 +86,7 @@ async def get_pre_match_news_upcoming(
 
 @app.get("/api/news/post-match", tags=["News — Post-Match"])
 async def get_post_match_news(
-    include: Optional[str] = Query("fixture;league;lines"),
+    include: Optional[str] = Query("fixture.participants;league;lines"),
     order: Optional[str] = Query("desc"),
     per_page: Optional[int] = Query(50),
     page: Optional[int] = Query(1),
@@ -98,7 +98,7 @@ async def get_post_match_news(
 @app.get("/api/news/post-match/seasons/{season_id}", tags=["News — Post-Match"])
 async def get_post_match_news_by_season(
     season_id: int,
-    include: Optional[str] = Query("fixture;league;lines"),
+    include: Optional[str] = Query("fixture.participants;league;lines"),
     order: Optional[str] = Query("desc"),
     per_page: Optional[int] = Query(50),
     page: Optional[int] = Query(1),

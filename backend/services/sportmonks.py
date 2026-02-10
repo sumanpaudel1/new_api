@@ -57,7 +57,7 @@ class SportMonksService:
     # ──────────────────────────────────────────────
 
     async def get_pre_match_news(
-        self, include="fixture;league;lines", order="desc", per_page=25, page=1
+        self, include="fixture.participants;league;lines", order="desc", per_page=25, page=1
     ):
         """GET Pre-Match News — all available pre-match articles."""
         url = f"{self.base_url}/news/pre-match"
@@ -66,7 +66,7 @@ class SportMonksService:
         )
 
     async def get_pre_match_news_by_season(
-        self, season_id: int, include="fixture;league;lines", order="desc", per_page=25, page=1
+        self, season_id: int, include="fixture.participants;league;lines", order="desc", per_page=25, page=1
     ):
         """GET Pre-Match News by Season ID."""
         url = f"{self.base_url}/news/pre-match/seasons/{season_id}"
@@ -75,7 +75,7 @@ class SportMonksService:
         )
 
     async def get_pre_match_news_upcoming(
-        self, include="fixture;league;lines", order="desc", per_page=25, page=1
+        self, include="fixture.participants;league;lines", order="desc", per_page=25, page=1
     ):
         """GET Pre-Match News for Upcoming Fixtures."""
         url = f"{self.base_url}/news/pre-match/upcoming"
@@ -84,7 +84,7 @@ class SportMonksService:
         )
 
     async def get_post_match_news(
-        self, include="fixture;league;lines", order="desc", per_page=25, page=1
+        self, include="fixture.participants;league;lines", order="desc", per_page=25, page=1
     ):
         """GET Post-Match News — all post-match articles."""
         url = f"{self.base_url}/news/post-match"
@@ -93,7 +93,7 @@ class SportMonksService:
         )
 
     async def get_post_match_news_by_season(
-        self, season_id: int, include="fixture;league;lines", order="desc", per_page=25, page=1
+        self, season_id: int, include="fixture.participants;league;lines", order="desc", per_page=25, page=1
     ):
         """GET Post-Match News by Season ID."""
         url = f"{self.base_url}/news/post-match/seasons/{season_id}"

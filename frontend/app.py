@@ -132,6 +132,91 @@ st.markdown("""
         border-left-color: #00d2ff;
     }
 
+    /* Match Banner with Team Logos */
+    .match-banner {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, rgba(10,10,40,0.95) 0%, rgba(20,20,60,0.8) 50%, rgba(10,10,40,0.95) 100%);
+        border: 1px solid rgba(255,255,255,0.06);
+        border-radius: 14px;
+        padding: 1.5rem 1rem;
+        margin-bottom: 1.2rem;
+        gap: 1rem;
+        position: relative;
+        overflow: hidden;
+    }
+    .match-banner::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: radial-gradient(ellipse at center, rgba(0,210,255,0.06) 0%, transparent 70%);
+        pointer-events: none;
+    }
+    .team-side {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        flex: 1;
+        z-index: 1;
+    }
+    .team-logo {
+        width: 68px;
+        height: 68px;
+        object-fit: contain;
+        filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+        transition: transform 0.3s ease;
+    }
+    .team-logo:hover {
+        transform: scale(1.12);
+    }
+    .team-logo-placeholder {
+        width: 68px;
+        height: 68px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        background: rgba(255,255,255,0.05);
+        border-radius: 50%;
+        border: 1px solid rgba(255,255,255,0.08);
+    }
+    .team-name-label {
+        color: #ccd6f6;
+        font-size: 0.82rem;
+        font-weight: 700;
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        max-width: 120px;
+        line-height: 1.3;
+    }
+    .vs-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.4rem;
+        z-index: 1;
+        min-width: 60px;
+    }
+    .vs-badge {
+        background: linear-gradient(135deg, #00d2ff, #3a7bd5);
+        color: white;
+        font-weight: 900;
+        font-size: 0.9rem;
+        padding: 5px 14px;
+        border-radius: 10px;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 15px rgba(0,210,255,0.25);
+    }
+    .league-badge-img {
+        width: 32px;
+        height: 32px;
+        object-fit: contain;
+        filter: drop-shadow(0 2px 6px rgba(0,0,0,0.3));
+    }
+
     /* Player mention tag */
     .player-tag {
         background: rgba(100,255,218,0.1);
@@ -379,7 +464,7 @@ def filter_articles_by_league(articles: list, selected_filters: list) -> list:
 
 
 def render_article(article: dict, index: int):
-    """Render a single news article as a rich card."""
+    """Render a single news article as a rich card with team images."""
     title = article.get("title", "Untitled Article")
     news_type = article.get("type", "news")
     created = article.get("created_at", "")
@@ -395,12 +480,60 @@ def render_article(article: dict, index: int):
     match_name = fixture.get("name", "") if isinstance(fixture, dict) else ""
     kick_off = fixture.get("starting_at", "") if isinstance(fixture, dict) else ""
 
+    # Participants (teams) with images
+    participants = fixture.get("participants", []) if isinstance(fixture, dict) else []
+    home_team = None
+    away_team = None
+    for p in participants:
+        if isinstance(p, dict):
+            meta = p.get("meta", {}) or {}
+            location = meta.get("location", "")
+            if location == "home":
+                home_team = p
+            elif location == "away":
+                away_team = p
+    # Fallback: use first two participants if no home/away distinction
+    if not home_team and not away_team and len(participants) >= 2:
+        home_team = participants[0]
+        away_team = participants[1]
+    elif not home_team and not away_team and len(participants) == 1:
+        home_team = participants[0]
+
+    # Build match banner HTML with team logos
+    banner_html = ""
+    if home_team or away_team:
+        home_img = home_team.get("image_path", "") if home_team else ""
+        home_name = home_team.get("name", "Home") if home_team else ""
+        away_img = away_team.get("image_path", "") if away_team else ""
+        away_name = away_team.get("name", "Away") if away_team else ""
+        league_badge = f"<img src='{league_img}' class='league-badge-img'>" if league_img else ""
+
+        home_logo_html = f'<img src="{home_img}" class="team-logo" alt="{home_name}">' if home_img else '<div class="team-logo-placeholder">🏠</div>'
+        away_logo_html = f'<img src="{away_img}" class="team-logo" alt="{away_name}">' if away_img else '<div class="team-logo-placeholder">✈️</div>'
+
+        banner_html = f"""
+        <div class="match-banner">
+            <div class="team-side">
+                {home_logo_html}
+                <div class="team-name-label">{home_name}</div>
+            </div>
+            <div class="vs-section">
+                {league_badge}
+                <div class="vs-badge">VS</div>
+            </div>
+            <div class="team-side">
+                {away_logo_html}
+                <div class="team-name-label">{away_name}</div>
+            </div>
+        </div>
+        """
+
     # Badge
     is_pre = "pre" in str(news_type).lower()
     badge_class = "badge-pre" if is_pre else "badge-post"
     badge_label = "PRE-MATCH" if is_pre else "POST-MATCH"
 
-    # League image
+    # League image for meta chip
     league_html = ""
     if league_img:
         league_html = f"<img src='{league_img}' width='20' style='vertical-align:middle;margin-right:4px;border-radius:3px;'>"
@@ -419,6 +552,7 @@ def render_article(article: dict, index: int):
 
     st.markdown(f"""
     <div class="article-card">
+        {banner_html}
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.5rem;">
             <div class="article-title">{index}. {title}</div>
             <span class="{badge_class}">{badge_label}</span>
@@ -643,8 +777,8 @@ with st.sidebar:
     with st.expander("⚙️ Advanced Settings", expanded=False):
         st.markdown('<p style="color:#8892b0;font-size:0.78rem;">For advanced users only. Default values work great!</p>', unsafe_allow_html=True)
 
-        include = st.text_input("Includes", value="fixture;league;lines",
-                                help="Related data to include: fixture, league, lines")
+        include = st.text_input("Includes", value="fixture.participants;league;lines",
+                                help="Related data to include: fixture.participants, league, lines")
         order = st.selectbox("Sort Order", ["desc", "asc"],
                              help="Newest first (desc) or oldest first (asc)")
         per_page = st.slider("Articles Per Page", 1, 50, 50,
@@ -670,7 +804,7 @@ with st.sidebar:
 try:
     _ = include
 except NameError:
-    include = "fixture;league;lines"
+    include = "fixture.participants;league;lines"
 try:
     _ = order
 except NameError:
